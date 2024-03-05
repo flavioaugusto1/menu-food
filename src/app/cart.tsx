@@ -1,4 +1,4 @@
-import { Alert, ScrollView, Text, View } from "react-native";
+import { Alert, ScrollView, Text, View, Linking } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Header } from "../components/header";
 import { ProductCartProps, useCartStore } from "../stores/cart-store";
@@ -9,9 +9,13 @@ import { Button } from "../components/button";
 import { Feather } from "@expo/vector-icons";
 import { LinkButton } from "../components/link-button";
 import { useState } from "react";
+import { useNavigation } from "expo-router";
+
+const PHONE_NUMBER = "5541992159311";
 
 export default function Cart() {
   const [address, setAddress] = useState("");
+  const navigation = useNavigation();
 
   const cartStore = useCartStore();
   const total = formatCurrency(
@@ -43,12 +47,19 @@ export default function Cart() {
 
     const message = `
       NOVO PEDIDO
-      \n Entregar em: ${address}
+  \n  Entregar em: ${address}
 
       ${products}
 
-      \nValor total: ${total}
+  \n  Valor total: ${total}
     `;
+
+    Linking.openURL(
+      `https://api.whatsapp.com/send?phone=${PHONE_NUMBER}&text=${message}`,
+    );
+
+    cartStore.clear();
+    navigation.goBack();
   }
 
   return (
@@ -82,6 +93,9 @@ export default function Cart() {
             <Input
               onChangeText={setAddress}
               placeholder="Informe endereço de entrega com rua, bairro, CEP, número e complemento"
+              onSubmitEditing={handleOrder}
+              blurOnSubmit
+              returnKeyType="next"
             />
           </View>
         </ScrollView>
