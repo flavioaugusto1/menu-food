@@ -5,11 +5,18 @@ import { Header } from "../components/header";
 import { CategoryButton } from "../components/category-button";
 import { useState, useRef } from "react";
 import { Product } from "../components/product";
+import { useCartStore } from "../stores/cart-store";
 
 export default function Home() {
+  const cartStore = useCartStore();
   const [category, setCategory] = useState(CATEGORIES[0]);
 
   const sectionListRef = useRef<SectionList>(null);
+
+  const cartQuantityItems = cartStore.products.reduce(
+    (total, product) => total + product.quantity,
+    0,
+  );
 
   function handleCategorySelected(categorySelected: string) {
     setCategory(categorySelected);
@@ -29,7 +36,7 @@ export default function Home() {
 
   return (
     <View className="flex-1 pt-8">
-      <Header title="Faça o seu pedido" cartQuantityItems={2} />
+      <Header title="Faça o seu pedido" cartQuantityItems={cartQuantityItems} />
 
       <FlatList
         data={CATEGORIES}
